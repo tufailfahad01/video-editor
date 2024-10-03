@@ -1,3 +1,5 @@
+import React from "react";
+
 interface TimelineProps {
   videoDuration: number;
   startTime: number;
@@ -5,7 +7,8 @@ interface TimelineProps {
   isDraggingStart: boolean;
   isDraggingEnd: boolean;
   handleTimelineClick: (event: React.MouseEvent<HTMLDivElement>) => void;
-  handleTimelineMouseDown: (event: React.MouseEvent<HTMLDivElement>) => void;
+  handleStartHandleMouseDown: () => void;
+  handleEndHandleMouseDown: () => void;
   handleTimelineMouseMove: (event: React.MouseEvent<HTMLDivElement>) => void;
   handleTimelineMouseUp: () => void;
 }
@@ -17,7 +20,8 @@ const Timeline: React.FC<TimelineProps> = ({
   isDraggingStart,
   isDraggingEnd,
   handleTimelineClick,
-  handleTimelineMouseDown,
+  handleStartHandleMouseDown,
+  handleEndHandleMouseDown,
   handleTimelineMouseMove,
   handleTimelineMouseUp,
 }) => {
@@ -40,21 +44,23 @@ const Timeline: React.FC<TimelineProps> = ({
             left: `${(startTime / videoDuration) * 100}%`,
           }}
         />
+        {/* Start Handle */}
         <div
-          className="absolute bg-red-500 h-full w-1"
+          className="absolute bg-red-500 h-full w-1 cursor-ew-resize"
           style={{
             left: `${(startTime / videoDuration) * 100}%`,
             transform: "translateX(-50%)",
           }}
-          onMouseDown={handleTimelineMouseDown}
+          onMouseDown={handleStartHandleMouseDown}
         />
+        {/* End Handle */}
         <div
-          className="absolute bg-red-500 h-full w-1"
+          className="absolute bg-red-500 h-full w-1 cursor-ew-resize"
           style={{
             left: `${(endTime / videoDuration) * 100}%`,
             transform: "translateX(-50%)",
           }}
-          onMouseDown={handleTimelineMouseDown}
+          onMouseDown={handleEndHandleMouseDown}
         />
       </div>
       <div className="flex justify-between mt-1">

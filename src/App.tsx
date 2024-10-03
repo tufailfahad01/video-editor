@@ -41,26 +41,24 @@ function App() {
     setCurrentTime(newTime);
   };
 
-  const handleTimelineMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
-    const timeline = event.currentTarget;
-    const rect = timeline.getBoundingClientRect();
-    const offsetX = event.clientX - rect.left;
-    const newTime = (offsetX / rect.width) * videoDuration;
+  const handleStartHandleMouseDown = () => {
+    setIsDraggingStart(true);
+  };
 
-    setIsDraggingStart(event.target === timeline);
-    setIsDraggingEnd(!isDraggingStart);
+  const handleEndHandleMouseDown = () => {
+    setIsDraggingEnd(true);
   };
 
   const handleTimelineMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (isDraggingStart || isDraggingEnd) {
-      const rect = event.currentTarget.getBoundingClientRect();
-      const offsetX = event.clientX - rect.left;
-      const newTime = (offsetX / rect.width) * videoDuration;
-
-      if (isDraggingStart) {
-        setStartTime(Math.min(newTime, endTime));
-      } else if (isDraggingEnd) {
-        setEndTime(Math.max(newTime, startTime));
+    if (isDraggingStart) {
+      const newTime = calculateTimeFromMouseEvent(event);
+      if (newTime < endTime) {
+        setStartTime(newTime);
+      }
+    } else if (isDraggingEnd) {
+      const newTime = calculateTimeFromMouseEvent(event);
+      if (newTime > startTime) {
+        setEndTime(newTime);
       }
     }
   };
@@ -68,6 +66,16 @@ function App() {
   const handleTimelineMouseUp = () => {
     setIsDraggingStart(false);
     setIsDraggingEnd(false);
+  };
+
+  const calculateTimeFromMouseEvent = (
+    event: React.MouseEvent<HTMLDivElement>
+  ): number => {
+    const timelineWidth = event.currentTarget.offsetWidth;
+    const clickX =
+      event.clientX - event.currentTarget.getBoundingClientRect().left;
+    const clickTime = (clickX / timelineWidth) * videoDuration;
+    return Math.max(0, Math.min(videoDuration, clickTime));
   };
 
   return (
@@ -85,15 +93,16 @@ function App() {
       />
 
       <Timeline
-        videoDuration={timelineWidth}
+        videoDuration={videoDuration}
         startTime={startTime}
         endTime={endTime}
         isDraggingStart={isDraggingStart}
         isDraggingEnd={isDraggingEnd}
-        handleTimelineMouseDown={handleTimelineMouseDown}
+        handleTimelineClick={handleTimelineClick}
+        handleStartHandleMouseDown={handleStartHandleMouseDown}
+        handleEndHandleMouseDown={handleEndHandleMouseDown}
         handleTimelineMouseMove={handleTimelineMouseMove}
         handleTimelineMouseUp={handleTimelineMouseUp}
-        handleTimelineClick={handleTimelineClick}
       />
     </>
   );
